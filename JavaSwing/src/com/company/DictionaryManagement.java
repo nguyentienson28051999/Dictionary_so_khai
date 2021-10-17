@@ -42,20 +42,21 @@ public class DictionaryManagement {
         String[][] data = {tu,nghia};
         return data;
     }
-    public String[][] dictionaryLookup(String[] word, String[] mean, String search){
-        if (search.equals("")){
-            return new String[][]{word, mean};
-        }
-        else{
-            String all_word = "";
-            String all_mean = "";
-            for (int i = 0; i< word.length; i++){
-                if(word[i].contains(search)){
-                    all_word += word[i] +"!";
-                    all_mean += mean[i] +"!";
-                }
+    public Word[] dictionaryLookup(Word[] word, String search){
+        String all_word = "";
+        String all_mean = "";
+        for (int i = 0; i< word.length; i++){
+            if(word[i].word.contains(search)){
+                all_word += word[i].word +"!";
+                all_mean += word[i].mean +"!";
             }
-            return new String[][]{all_word.split("!"), all_mean.split("!")};
         }
+        String[] arr_word = all_word.split("!");
+        String[] arr_mean = all_mean.split("!");
+        Word[] new_word = new Word[arr_word.length];
+        for (int i=0;i<arr_word.length;i++){
+            new_word[i] = new Word(arr_word[i],arr_mean[i]);
+        }
+        return new_word;
     }
 }

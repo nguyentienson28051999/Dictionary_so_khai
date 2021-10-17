@@ -1,38 +1,51 @@
 package com.company;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.util.Locale;
+import javax.speech.Central;
+import javax.speech.synthesis.Synthesizer;
+import javax.speech.synthesis.SynthesizerModeDesc;
 
-class AppendFileDemo2
-{
-    public static void main( String[] args )
+public class ABC {
+
+    public static void main(String[] args)
     {
-        try{
-            File file =new File("C://myfile.txt");
-            if(!file.exists()){
-                file.createNewFile();
-            }
-            FileWriter fw = new FileWriter(file,true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter pw = new PrintWriter(bw);
-            //This will add a new line to the file content
-            pw.println("");
-            /* Below three statements would add three
-             * mentioned Strings to the file in new lines.
-             */
-            pw.println("This is first line");
-            pw.println("This is the second line");
-            pw.println("This is third line");
-            pw.close();
 
-            System.out.println("Data successfully appended at the end of file");
+        try {
+            // Set property as Kevin Dictionary
+            System.setProperty(
+                    "freetts.voices",
+                    "com.sun.speech.freetts.en.us"
+                            + ".cmu_us_kal.KevinVoiceDirectory");
 
-        }catch(IOException ioe){
-            System.out.println("Exception occurred:");
-            ioe.printStackTrace();
+            // Register Engine
+            Central.registerEngineCentral(
+                    "com.sun.speech.freetts"
+                            + ".jsapi.FreeTTSEngineCentral");
+
+            // Create a Synthesizer
+            Synthesizer synthesizer
+                    = Central.createSynthesizer(
+                    new SynthesizerModeDesc(Locale.US));
+
+            // Allocate synthesizer
+            synthesizer.allocate();
+
+            // Resume Synthesizer
+            synthesizer.resume();
+
+            // Speaks the given text
+            // until the queue is empty.
+            synthesizer.speakPlainText(
+                    "How old are you", null);
+            synthesizer.waitEngineState(
+                    Synthesizer.QUEUE_EMPTY);
+
+            // Deallocate the Synthesizer.
+            synthesizer.deallocate();
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

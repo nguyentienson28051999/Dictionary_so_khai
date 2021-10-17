@@ -1,6 +1,10 @@
 package com.company;
 
 public class Word {
-    public static String word;
-    public static String mean;
+    public String word;
+    public String mean;
+    public Word(String word,String mean){
+        this.word = word;
+        this.mean = mean;
+    }
 }
