@@ -40,16 +40,19 @@ public class Main {
         final JFrame[] f = {new JFrame()};
         JPanel panel = new JPanel();
         JFrame frame_add = new JFrame("Thêm từ mới");
+        JFrame frame_fix = new JFrame("Sửa từ");
         JLabel themtu = new JLabel();
+
+        final int[] index_this_word = {0};
 
         DictionaryManagement dictionaryManagement = new DictionaryManagement();
         String[][] all_data = dictionaryManagement.insertFromFile("src\\com\\company\\dictionaries.txt");
         Word[] all_word = new Word[all_data[0].length];
         final Word[][] all_word_present = {new Word[all_data[0].length]};
-       for (int i = 0; i< all_data[0].length; i++){
-           Word temp_word = new Word(all_data[0][i], all_data[1][i]);
-           all_word[i] = temp_word;
-           all_word_present[0][i] = temp_word;
+        for (int i = 0; i< all_data[0].length; i++){
+            Word temp_word = new Word(all_data[0][i], all_data[1][i]);
+            all_word[i] = temp_word;
+            all_word_present[0][i] = temp_word;
         }
 
         themtu.setText("Từ mới");
@@ -70,6 +73,39 @@ public class Main {
         JButton add_tumoi_xn = new JButton("Xác nhận");
         add_tumoi_xn.setBounds(120,200,120,50);
         frame_add.add(add_tumoi_xn);
+        // Hết Frame thêm từ
+        JButton d = new JButton("Sửa");// tạo thể hiện của JButton
+        d.setBounds(200, 300, 100, 40);// trục x , y , width, height
+        f[0].add(d);
+        JLabel suatu = new JLabel();// Sửa từ
+        suatu.setText("Từ sửa");
+        suatu.setBounds(70,50,120,50);
+        frame_fix.add(suatu);
+        frame_fix.setSize(400, 400);
+        frame_fix.setLayout(new FlowLayout());
+        JTextField fix_tu = new JTextField(10);
+        fix_tu.setBounds(50,100,120,50);
+        frame_fix.add(fix_tu);
+        JLabel fixnghia = new JLabel();
+        fixnghia.setText("Nghĩa mới");
+        fixnghia.setBounds(220,50,120,50);
+        frame_fix.add(fixnghia);
+        JTextField fix_nghiamoi = new JTextField(10);
+        fix_nghiamoi.setBounds(200,100,120,50);
+        frame_fix.add(fix_nghiamoi);
+        JButton fix_tu_xn = new JButton("Xác nhận");
+        fix_tu_xn.setBounds(120,200,120,50);
+        frame_fix.add(fix_tu_xn);
+        d.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame_fix.setLayout(null);
+                frame_fix.setVisible(true);
+                String tu = all_word_present[0][index_this_word[0]].word ;
+                String nghia_moi = all_word_present[0][index_this_word[0]].mean ;
+                fix_tu.setText(tu);
+                fix_nghiamoi.setText(nghia_moi);
+            }
+        });// Hết sửa từ
         JTextField jTextField = new JTextField(10);
         panel.add(jTextField);
         panel.setBounds(50,50,120,50);
@@ -95,6 +131,7 @@ public class Main {
                     if (index >= 0) {
                         Object o = theList.getModel().getElementAt(index);
                         txtMain.setText(all_word_present[0][index].mean);
+                        index_this_word[0] = index;
                     }
                 }
             }
@@ -153,19 +190,23 @@ public class Main {
             }
         });
         f[0].add(c);
-
-        JButton d = new JButton("Sửa");// tạo thể hiện của JButton
-        d.setBounds(200, 300, 100, 40);// trục x , y , width, height
-        f[0].add(d);
         JButton e = new JButton("Xoá");// tạo thể hiện của JButton
         e.setBounds(200, 350, 100, 40);// trục x , y , width, height
         f[0].add(e);
-        JButton g = new JButton("V");// tạo thể hiện của JButton
-        g.setBounds(340, 50, 40, 40);// trục x , y , width, height
+        e.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Bạn không thể xoá Tuấn khỏi trái tim S!", "Thông báo xoá từ!", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        JButton g = new JButton("Voice");// tạo thể hiện của JButton
+        g.setBounds(340, 50, 80, 40);// trục x , y , width, height
         f[0].add(g);
         g.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                main.speak(jTextField.getText());
+                String test = jTextField.getText();
+                if(!jTextField.getText().equals("")){
+                    main.speak(jTextField.getText());
+                }
             }
         });
         JLabel m = new JLabel("");
@@ -179,30 +220,43 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 String tu_moi = add_tumoi.getText() ;
                 String nghia_moi = add_nghiamoi.getText() ;
-                if (main.kiem_tra_trung(main.get_all_word(all_word_present[0]),tu_moi) > -1){
-                    JOptionPane.showMessageDialog(null, "Từ này đã tồn tại!", "Thông báo lỗi!", JOptionPane.INFORMATION_MESSAGE);
-                }
-                else{
-                    all_word_present[0] = main.insert(all_word_present[0],tu_moi,nghia_moi);
-                    JList[] jlist = {new JList(main.get_all_word(all_word_present[0]))};
-                    scrollList.setViewportView(jlist[0]);
-                    jlist[0].addMouseListener(mouseListener);
-                    try {
-                        String all_data = "";
-                        FileWriter myWriter = new FileWriter("src\\com\\company\\dictionaries.txt");
-                        for (int i=0;i< all_word_present[0].length;i++){
-                            all_data += "\n"+all_word_present[0][i].word+"\t"+all_word_present[0][i].word;
-                        }
-                        myWriter.write(all_data);
-                        myWriter.close();
-                        System.out.println("Successfully wrote to the file.");
-                    } catch (IOException x) {
-                        System.out.println("An error occurred.");
-                        x.printStackTrace();
+                all_word_present[0] = main.insert(all_word_present[0],tu_moi,nghia_moi);
+                JList[] jlist = {new JList(main.get_all_word(all_word_present[0]))};
+                scrollList.setViewportView(jlist[0]);
+                jlist[0].addMouseListener(mouseListener);
+                main.write_file(all_word_present);
+                frame_add.dispose();
+            }
+        });
+        fix_tu_xn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                all_word_present[0][index_this_word[0]].word = fix_tu.getText() ;
+                all_word_present[0][index_this_word[0]].mean = fix_nghiamoi.getText();
+                JList[] jlist = {new JList(main.get_all_word(all_word_present[0]))};
+                scrollList.setViewportView(jlist[0]);
+                jlist[0].addMouseListener(mouseListener);
+                main.write_file(all_word_present);
+                frame_fix.dispose();
+            }
+        });
+        e.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Word[] new_arr = new Word[all_word_present[0].length-1];
+                for (int i =0;i<all_word_present[0].length;i++){
+                    if (i < index_this_word[0]){
+                        new_arr[i] = all_word_present[0][i];
                     }
-                    frame_add.dispose();
-//                    frame_add.dispatchEvent(new WindowEvent(frame_add, WindowEvent.WINDOW_CLOSING));
+                    else if(i > index_this_word[0]){
+                        new_arr[i-1] = all_word_present[0][i];
+                    }
                 }
+                all_word_present[0] = new_arr;
+                JList[] jlist = {new JList(main.get_all_word(all_word_present[0]))};
+                scrollList.setViewportView(jlist[0]);
+                jlist[0].addMouseListener(mouseListener);
+                main.write_file(all_word_present);
+                frame_fix.dispose();
+//                    frame_add.dispatchEvent(new WindowEvent(frame_add, WindowEvent.WINDOW_CLOSING));
             }
         });
 
@@ -211,6 +265,7 @@ public class Main {
         f[0].setVisible(true);// hiển thị cửa s
         f[0].setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    // Sắp xếp sau khi thêm từ mới vào mảng
     public Word[] sap_sep_mang(Word[] str){
         Word temp;
         for (int i = 0; i < str.length; i++)
@@ -226,16 +281,7 @@ public class Main {
         }
         return str;
     }
-    public int kiem_tra_trung(String[] array, String a){
-        String temp;
-        for (int i = 0; i < array.length; i++)
-        {
-            if (array[i].equals(a)){
-                return i;
-            }
-        }
-        return -1;
-    }
+    // Thêm từ mới vào mảng
     public static Word [] insert(Word [] arr, String tu_moi, String nghia_moi ) {
         int len = arr.length;
         Main main = new Main();
@@ -246,6 +292,7 @@ public class Main {
         tempArr[0] = new Word(tu_moi,nghia_moi);
         return main.sap_sep_mang(tempArr);
     }
+    // Lấy toàn bộ từ vựng để thêm vào jlist
     public String[] get_all_word( Word[] word){
         String[] data = new String[word.length];
         for(int i = 0;i<word.length;i++){
@@ -253,16 +300,8 @@ public class Main {
         }
         return data;
     }
-    public String[] get_all_mean( Word[] word){
-        String[] data = new String[word.length];
-        for(int i = 0;i<word.length;i++){
-            data[i] = word[i].mean;
-        }
-        return data;
-    }
-    public String callTranslate(String langFrom, String langTo,
-                                String word) throws Exception
-    {
+    // Gọi đến api của google để lấy nghĩa của từ
+    public String callTranslate(String langFrom, String langTo, String word) throws Exception {
 
         String url = "https://translate.googleapis.com/translate_a/single?"+
                 "client=gtx&"+
@@ -286,15 +325,14 @@ public class Main {
 
         return parseResult(response.toString());
     }
+    // Sử lý json để chuyển thành string
     public String parseResult(String inputJson) throws Exception {
-
         JSONArray jsonArray = new JSONArray(inputJson);
         JSONArray jsonArray2 = (JSONArray) jsonArray.get(0);
         JSONArray jsonArray3 = (JSONArray) jsonArray2.get(0);
-
         return jsonArray3.get(0).toString();
     }
-
+    // hàm dùng thư viện để phát âm từ tiếng anh
     public void speak(String word){
         try {
             // Set property as Kevin Dictionary
@@ -332,6 +370,27 @@ public class Main {
 
         catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    // Sau khi thêm và
+    public void write_file(Word[][] all_word_present){
+        try {
+            String all_data = "";
+            FileWriter myWriter = new FileWriter("src\\com\\company\\dictionaries.txt");
+            for (int i=0;i< all_word_present[0].length;i++){
+                if (i<all_word_present[0].length -1){
+                    all_data += all_word_present[0][i].word+"\t"+all_word_present[0][i].mean+"\n";
+                }
+                else{
+                    all_data += all_word_present[0][i].word+"\t"+all_word_present[0][i].mean;
+                }
+            }
+            myWriter.write(all_data);
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException x) {
+            System.out.println("An error occurred.");
+            x.printStackTrace();
         }
     }
 }

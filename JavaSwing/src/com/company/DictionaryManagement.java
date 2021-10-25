@@ -30,18 +30,28 @@ public class DictionaryManagement {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        //Chia file thành các dòng
         String[] list = content.split("\n");
         final String[] tu = new String[list.length];
         final String[] nghia = new String[list.length];
         for(int i=0; i< list.length; i++){
+            // Chia nghĩa và từ theo đấu tab
             String[] line = list[i].split("\t");
-            tu[i] = line[0];
-            nghia[i] = line[line.length - 1];
+            //Kiểm tra nếu không có dữ liệu thì để rỗng
+            if (line.length==2){
+                tu[i] = line[0];
+                nghia[i] = line[line.length - 1];
+            }
+            else {
+                tu[i] = "";
+                nghia[i] = "";
+            }
         }
         String[][] data = {tu,nghia};
         return data;
     }
+
+    // Tìm kiếm các từ tương tự có chứa chuỗi kí tự ở ô tìm kiếm
     public Word[] dictionaryLookup(Word[] word, String search){
         String all_word = "";
         String all_mean = "";
